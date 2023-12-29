@@ -6,11 +6,15 @@ using FireSharp.Response;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using FirebaseAdmin.Messaging;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 
 namespace BookingRoom.Controllers
 {
 	public class BookingController : Controller
 	{
+		
 		IFirebaseConfig config = new FireSharp.Config.FirebaseConfig
 		{
 			AuthSecret = "K1cf1DhpkqxvOkAeqgLElTfzWvDwy09UuRzLrZXU",
@@ -29,6 +33,20 @@ namespace BookingRoom.Controllers
 			{
 				AuthTokenAsyncFactory = () => Task.FromResult(authLink.FirebaseToken)
 			});
+
+			
+			if (FirebaseApp.DefaultInstance == null)
+			{
+				FirebaseApp.Create(new AppOptions()
+				{
+					Credential = GoogleCredential.FromFile("wwwroot/booking-room-app-f6938-firebase-adminsdk-9dz98-d7d26db137.json")
+				});
+			}
+			else
+			{
+				// Use the existing app
+				var app = FirebaseApp.GetInstance;
+			}
 		}
 		public IActionResult Index()
 		{
@@ -59,9 +77,11 @@ namespace BookingRoom.Controllers
 		{
 			client = new FireSharp.FirebaseClient(config);
 			FirebaseResponse response = client.Get("Bookings/" + id);
-			Booking data = JsonConvert.DeserializeObject<Booking>(response.Body);
-			data.status = "Approved";
-			SetResponse Response = client.Set("Bookings/" + data.bookingId, data);
+			Booking booking = JsonConvert.DeserializeObject<Booking>(response.Body);
+			booking.status = "Approved";
+			SetResponse Response = client.Set("Bookings/" + booking.bookingId, booking);
+
+			PushNotify(booking.userName,true);
 			return RedirectToAction("Index", "Booking");
 		}
 		[HttpGet]
@@ -69,10 +89,51 @@ namespace BookingRoom.Controllers
 		{
 			client = new FireSharp.FirebaseClient(config);
 			FirebaseResponse response = client.Get("Bookings/" + id);
-			Booking data = JsonConvert.DeserializeObject<Booking>(response.Body);
-			data.status = "Declined";
-			SetResponse Response = client.Set("Bookings/" + data.bookingId, data);
+			Booking booking = JsonConvert.DeserializeObject<Booking>(response.Body);
+			booking.status = "Declined";
+			SetResponse Response = client.Set("Bookings/" + booking.bookingId, booking);
+			PushNotify(booking.userName, false);
 			return RedirectToAction("Index", "Booking");
+		}
+
+		public void PushNotify(String username,bool status)
+		{
+			FirebaseResponse response = client.Get("users/" + username);
+			Models.User user = JsonConvert.DeserializeObject<Models.User>(response.Body);
+			// Send push notification
+			if (status == true)
+			{
+				var messaging = FirebaseMessaging.DefaultInstance;
+				var message = new Message()
+				{
+
+					Token = user.fcmToken,
+					Notification = new Notification()
+					{
+						Title = "Booking Approved",
+						Body = "A new booking has been approved."
+					}
+				};
+
+				messaging.SendAsync(message);
+			}
+			else
+			{
+				var messaging = FirebaseMessaging.DefaultInstance;
+				var message = new Message()
+				{
+
+					Token = user.fcmToken,
+					Notification = new Notification()
+					{
+						Title = "Booking Declined",
+						Body = "A new booking has been declined."
+					}
+				};
+
+				messaging.SendAsync(message);
+			}
+			
 		}
 
 

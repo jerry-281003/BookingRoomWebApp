@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "279273781346",
+    "firebase_url": "https://booking-room-app-f6938-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "booking-room-app-f6938",
+    "storage_bucket": "booking-room-app-f6938.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:279273781346:android:28a49f1d6ac2269887b93b",
+        "android_client_info": {
+          "package_name": "com.example.bookingroom"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_tQLMK2xQX0qLO--ZMTYvDTb7OikpqrQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

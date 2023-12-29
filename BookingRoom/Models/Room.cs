@@ -9,7 +9,5 @@
 		public bool Status { get; set; }
 		public string UniversityName { get; set; }
 		public string Function { get; set; }
-
-       
     }
 }
