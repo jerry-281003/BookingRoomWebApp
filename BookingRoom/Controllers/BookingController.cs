@@ -9,6 +9,10 @@ using Newtonsoft.Json;
 using FirebaseAdmin.Messaging;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
+using static Google.Apis.Requests.BatchRequest;
+using Microsoft.VisualBasic;
+using Microsoft.AspNetCore.Http;
+using System.Globalization;
 
 namespace BookingRoom.Controllers
 {
@@ -51,7 +55,7 @@ namespace BookingRoom.Controllers
 		public IActionResult Index()
 		{
 			client = new FireSharp.FirebaseClient(config);
-			FirebaseResponse response = client.Get("Bookings");
+			FirebaseResponse response = client.Get("Bookings/UEF");
 			dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
 			var list = new List<Booking>();
 
@@ -76,7 +80,7 @@ namespace BookingRoom.Controllers
 		public async Task<ActionResult> Approved(string id)
 		{
 			client = new FireSharp.FirebaseClient(config);
-			FirebaseResponse response = client.Get("Bookings/" + id);
+			FirebaseResponse response = client.Get("Bookings/UEF/" + id);
 			Booking booking = JsonConvert.DeserializeObject<Booking>(response.Body);
 			booking.status = "Approved";
 			SetResponse Response = client.Set("Bookings/" + booking.bookingId, booking);
@@ -88,7 +92,7 @@ namespace BookingRoom.Controllers
 		public async Task<ActionResult> Declined(string id)
 		{
 			client = new FireSharp.FirebaseClient(config);
-			FirebaseResponse response = client.Get("Bookings/" + id);
+			FirebaseResponse response = client.Get("Bookings/UEF/" + id);
 			Booking booking = JsonConvert.DeserializeObject<Booking>(response.Body);
 			booking.status = "Declined";
 			SetResponse Response = client.Set("Bookings/" + booking.bookingId, booking);
@@ -135,7 +139,59 @@ namespace BookingRoom.Controllers
 			}
 			
 		}
+		public IActionResult Chart()
+		{
+			//get room
+			client = new FireSharp.FirebaseClient(config);
+			FirebaseResponse response = client.Get("Rooms");
+			dynamic room = JsonConvert.DeserializeObject<dynamic>(response.Body);
+			var list = new List<RoomStatistical>();
+			if (room != null)
+			{
+				foreach (var item in room)
+				{
+					list.Add(JsonConvert.DeserializeObject<RoomStatistical>(((JProperty)item).Value.ToString()));				
+				}
+				foreach (RoomStatistical roomstatistical in list)
+				{
+					roomstatistical.numBookingpPerYear = CountBooking("year",roomstatistical.RoomName);
+					roomstatistical.numBookingpPerMonth = CountBooking("month", roomstatistical.RoomName);
+				}
+			}
+			
+			
 
-
+			return View(list);
+		}
+		public int CountBooking(String type, String roomName)
+		{
+			// get booking
+			
+			FirebaseResponse response = client.Get("Bookings/UEF");
+			dynamic booking = JsonConvert.DeserializeObject<dynamic>(response.Body);
+			
+			int count = 0;
+			if (booking != null)
+			{
+				foreach (var item in booking)
+				{
+					Booking booking1 = JsonConvert.DeserializeObject<Booking>(((JProperty)item).Value.ToString());
+					string format = "HH:mm dd/MM/yyyy";				
+					DateTime datetime = DateTime.ParseExact(booking1.date, format, CultureInfo.InvariantCulture);
+					
+					
+					if (booking1 != null && booking1.status == "Approved" && booking1.roomName==roomName && datetime.Year==2024 && type== "year" )
+					{					
+						count++;
+					}
+					if (booking1 != null && booking1.status == "Approved" && booking1.roomName == roomName && datetime.Month == 1 && type == "month")
+					{
+						count++;
+					}
+					return count;
+				}
+			}
+			return count;
+		}
 	}
 }

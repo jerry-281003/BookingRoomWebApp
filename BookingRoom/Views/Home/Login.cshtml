@@ -1,0 +1,197 @@
+﻿
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Responsive Login and Signup Form </title>
+
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-database.js"></script>
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Boxicons CSS -->
+    <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
+    <script>
+        var firebaseConfig = {
+            apiKey: "AIzaSyAI67BIPvZDS1mf-dQdSNxp83XmCTlxanI",
+            authDomain: "booking-room-app-f6938.firebaseapp.com",
+            databaseURL: "https://booking-room-app-f6938-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "booking-room-app-f6938",
+            storageBucket: "booking-room-app-f6938.appspot.com",
+            messagingSenderId: "279273781346",
+            appId: "1:279273781346:web:803074269ebaa48987b93b",
+            measurementId: "G-K5WLJNM767"
+        };
+        firebase.initializeApp(firebaseConfig);
+    </script>
+</head>
+<body>
+    <section class="container forms">
+        <div class="form login">
+            <div class="form-content">
+                <header>Login</header>
+                <form id="signinForm" asp-controller="Home" asp-action="index" method="get">
+                    <div class="field input-field">
+                        <input name ="email" type="email" id="signinEmail" placeholder="Email" class="input">
+                    </div>
+
+                    <div class="field input-field">
+                        <input name="password" type="password" id="signinPassword" placeholder="Password" class="password">
+                        <i class='bx bx-hide eye-icon'></i>
+                    </div>
+
+                    <div class="form-link">
+                        <a href="#" class="forgot-pass">Forgot password?</a>
+                    </div>
+
+                    <div class="field button-field">
+                        <button type="submit">Login</button>
+                    </div>
+                </form>
+
+                <div class="form-link">
+                    <span>Don't have an account? <a href="#" class="link signup-link">Signup</a></span>
+                </div>
+            </div>
+
+            <div class="line"></div>
+
+            <div class="media-options">
+                <a href="#" class="field facebook">
+                    <i class='bx bxl-facebook facebook-icon'></i>
+                    <span>Login with Facebook</span>
+                </a>
+            </div>
+
+            <div class="media-options">
+                <a href="#" class="field google">
+                    <img src="images/google.png" alt="" class="google-img">
+                    <span>Login with Google</span>
+                </a>
+            </div>
+
+        </div>
+
+        <!-- Signup Form -->
+
+        <div class="form signup">
+            <div class="form-content">
+                <header>Signup</header>
+                <form  id="signupForm" >
+                    <div class="field input-field">
+                        <input type="email" id="email" placeholder="Email" class="input">
+                    </div>
+
+                    <div class="field input-field">
+                        <input type="password" id="password" placeholder="Create password" class="password">
+                    </div>
+
+                    <div class="field input-field">
+                        <input type="text" id="name" placeholder="name" class="password">
+                        <i class='bx bx-hide eye-icon'></i>
+                    </div>
+
+                    <div class="field button-field">
+                        <button type="submit">Signup</button>
+                    </div>
+                </form>
+
+                <div class="form-link">
+                    <span>Already have an account? <a href="#" class="link login-link">Login</a></span>
+                </div>
+            </div>
+
+            <div class="line"></div>
+
+            <div class="media-options">
+                <a href="#" class="field facebook">
+                    <i class='bx bxl-facebook facebook-icon'></i>
+                    <span>Login with Facebook</span>
+                </a>
+            </div>
+
+            <div class="media-options">
+                <a href="#" class="field google">
+                    <img src="images/google.png" alt="" class="google-img">
+                    <span>Login with Google</span>
+                </a>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- JavaScript -->
+    <script >
+        const forms = document.querySelector(".forms"),
+            pwShowHide = document.querySelectorAll(".eye-icon"),
+            links = document.querySelectorAll(".link");
+
+        pwShowHide.forEach(eyeIcon => {
+            eyeIcon.addEventListener("click", () => {
+                let pwFields = eyeIcon.parentElement.parentElement.querySelectorAll(".password");
+
+                pwFields.forEach(password => {
+                    if (password.type === "password") {
+                        password.type = "text";
+                        eyeIcon.classList.replace("bx-hide", "bx-show");
+                        return;
+                    }
+                    password.type = "password";
+                    eyeIcon.classList.replace("bx-show", "bx-hide");
+                })
+
+            })
+        })
+
+        links.forEach(link => {
+            link.addEventListener("click", e => {
+                e.preventDefault(); //preventing form submit
+                forms.classList.toggle("show-signup");
+            })
+        })
+    </script>
+   
+    <script>
+        // Sign Up
+        document.getElementById('signupForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            var email = document.getElementById('email').value;
+            var password = document.getElementById('password').value;
+            var name = document.getElementById('name').value;
+
+            firebase.auth().createUserWithEmailAndPassword(email, password).then(function () {
+                // Save the name to the database
+                firebase.database().ref('users/' + firebase.auth().currentUser.uid).set({
+                    name: name
+                });
+            }).catch(function (error) {
+                alert(error.message);
+            });
+        });
+
+        // Sign In
+        document.getElementById('signinForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            var email = document.getElementById('signinEmail').value;
+            var password = document.getElementById('signinPassword').value;
+
+            firebase.auth().signInWithEmailAndPassword(email, password)
+                .then(function (userCredential) {
+                    // Handle successful authentication here
+                    var user = userCredential.user;
+                    console.log("Authentication successful for user:", user);
+                    window.location.href = "/Home/Index"
+                    
+                })
+            .catch(function (error) {
+                alert(error.message);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -36,13 +36,15 @@
 			<nav class="navbar navbar-expand navbar-light navbar-bg">
 				<a class="sidebar-toggle js-sidebar-toggle">
 					<i class="hamburger align-self-center"></i>
+					
 				</a>
+				<partial name="_NavProfile">
 			</nav>
 
 			<main class="content">
 				<div class="container-fluid">
 
-					<h1 class="h3 mb-3"></h1>
+					<h1 class="h3 mb-3">Booking request</h1>
 
 					<div class="row">
 						<div class="col-12">
@@ -67,24 +69,26 @@
 									<table class="table">
 										<thead>
 											<tr>
-
 												<th>
-													@Html.DisplayNameFor(model => model.roomName)
+													Username
 												</th>
 												<th>
-													@Html.DisplayNameFor(model => model.universityName)
+													Room
 												</th>
 												<th>
-													@Html.DisplayNameFor(model => model.shift)
+													University
 												</th>
 												<th>
-													@Html.DisplayNameFor(model => model.date)
+													Shift
 												</th>
 												<th>
-													@Html.DisplayNameFor(model => model.purpose)
+													Date
 												</th>
 												<th>
-													@Html.DisplayNameFor(model => model.status)
+													Purpose
+												</th>
+												<th>
+													Status
 												</th>
 
 												<th></th>
@@ -94,7 +98,10 @@
 											@foreach (var item in Model)
 											{
 												<tr>
-
+													<td>
+														<a asp-controller="User" asp-action="Details" asp-route-id="@item.userName">@Html.DisplayFor(modelItem => item.userName)</a>
+														
+													</td>
 													<td>
 														@Html.DisplayFor(modelItem => item.roomName)
 													</td>
@@ -114,6 +121,7 @@
 													<td>
 														@Html.DisplayFor(modelItem => item.status)
 													</td>
+													 
 
 													<td>
 														<a asp-action="Approved" asp-route-id="@item.bookingId">Approved</a>

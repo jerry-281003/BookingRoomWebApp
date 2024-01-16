@@ -1,6 +1,6 @@
-﻿@model IEnumerable<BookingRoom.Models.Room>
+﻿@model IEnumerable<BookingRoom.Models.RoomStatistical>
 
-
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -12,11 +12,11 @@
 	<meta name="keywords" content="adminkit, bootstrap, bootstrap 5, admin, dashboard, template, responsive, css, sass, html, theme, front-end, ui kit, web">
 
 	<link rel="preconnect" href="https://fonts.gstatic.com">
-	<link rel="shortcut icon" href="/img/icons/icon-48x48.png" />
+	<link rel="shortcut icon" href="img/icons/icon-48x48.png" />
 
-	<link rel="canonical" href="https://demo-basic.adminkit.io/pages-blank.html" />
+	<link rel="canonical" href="https://demo-basic.adminkit.io/charts-chartjs.html" />
 
-	<title>Blank Page | AdminKit Demo</title>
+	<title>Chart.js | AdminKit Demo</title>
 
 	<link href="/css/app.css" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
@@ -26,10 +26,11 @@
 	<div class="wrapper">
 		<nav id="sidebar" class="sidebar js-sidebar">
 			<div class="sidebar-content js-simplebar">
-				<a class="sidebar-brand" href="/Admin">
+				<a class="sidebar-brand" href="index.html">
 					<span class="align-middle">AdminKit</span>
 				</a>
-				<partial name="_Navbar" />
+
+				<partial name="_Navbar" /> 
 			</div>
 		</nav>
 
@@ -39,20 +40,37 @@
 					<i class="hamburger align-self-center"></i>
 					
 				</a>
-				<partial name="_NavProfile" />
+				<partial name="_NavProfile">
+				
 			</nav>
 
 			<main class="content">
-				<div class="container-fluid">
+				<div class="container-fluid p-0">
 
-					<h1 class="h3 mb-3">Room</h1>
-
-					<div class="row">
-						<div class="col-12">
+					<div class="mb-3">
+						<h1 class="h3 d-inline align-middle">Booking statistical</h1>
+					</div>
+					<div class="row">								
+						<div class="col-12 col-lg-6">
 							<div class="card">
 								<div class="card-header">
-									<h5 class="card-title mb-0"></h5>
+									<h5 class="card-title">Booking Chart</h5>
+									<h6 class="card-subtitle text-muted"></h6>
 								</div>
+								<div class="card-body">
+									<div class="chart chart-sm">
+										<canvas id="chartjs-doughnut"></canvas>
+									</div>
+								</div>
+							</div>
+						</div>		
+					</div>
+					<div class="col-12">
+						<div class="card">
+							<div class="card-header">
+								<h5 class="card-title mb-0"></h5>
+							</div>
+							<div class="card-body">
 								<div class="card-body">
 									<style>
 										.bordered-table {
@@ -67,15 +85,12 @@
 											}
 									</style>
 
-									<p>
-										<a asp-action="Create">Create New</a>
-									</p>
 									<table class="table">
 										<thead>
 											<tr>
 
 												<th>
-													Room
+													@Html.DisplayNameFor(model => model.RoomName)
 												</th>
 												<th>
 													@Html.DisplayNameFor(model => model.MaxCapacity)
@@ -87,12 +102,17 @@
 													@Html.DisplayNameFor(model => model.Function)
 												</th>
 												<th>
-													University
+													@Html.DisplayNameFor(model => model.UniversityName)
 												</th>
 												<th>
 													@Html.DisplayNameFor(model => model.Status)
 												</th>
-											
+												<th>
+													Booking Per Year
+												</th>
+												<th>
+													Booking Per Month
+												</th>
 												<th></th>
 											</tr>
 										</thead>
@@ -120,29 +140,57 @@
 													<td>
 														@Html.DisplayFor(modelItem => item.Status)
 													</td>
-													
 													<td>
-														<a asp-action="Edit" asp-route-id="@item.RoomId">Edit</a> |
-														<a asp-action="Delete" asp-route-id="@item.RoomId">Delete</a>
+														@Html.DisplayFor(modelItem => item.numBookingpPerYear)
 													</td>
+													<td>
+														@Html.DisplayFor(modelItem => item.numBookingpPerMonth)
+													</td>
+
+													
 												</tr>
 											}
 										</tbody>
 									</table>
-
-								</div>
-							</div>
 						</div>
 					</div>
-
 				</div>
-			</main>
-
-
+			</main>			
 		</div>
 	</div>
 
 	<script src="/js/app.js"></script>
+
+	
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+			// Doughnut chart
+			new Chart(document.getElementById("chartjs-doughnut"), {
+				type: "doughnut",
+				data: {
+					labels: ["Social", "Search Engines", "Direct", "Other"],
+					datasets: [{
+						data: [260, 125, 54, 146],
+						backgroundColor: [
+							window.theme.primary,
+							window.theme.success,
+							window.theme.warning,
+							"#dee2e6"
+						],
+						borderColor: "transparent"
+					}]
+				},
+				options: {
+					maintainAspectRatio: false,
+					cutoutPercentage: 65,
+					legend: {
+						display: false
+					}
+				}
+			});
+		});
+	</script>
+	
 
 </body>
 

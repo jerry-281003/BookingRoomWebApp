@@ -39,6 +39,7 @@
 				<a class="sidebar-toggle js-sidebar-toggle">
 					<i class="hamburger align-self-center"></i>
 				</a>
+				<partial name="_NavProfile" />
 			</nav>
 
 			<main class="content">
@@ -92,7 +93,7 @@
 														@Html.DisplayFor(modelItem => item.UniversityName)
 													</td>
 													<td>
-														<img src="~/University_logo/@item.LogoPath " width="100" hight="100" />
+														<img src="@item.LogoUrl " width="100" hight="100" />
 													</td>
 
 													<td>
